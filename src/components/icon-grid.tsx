@@ -18,13 +18,13 @@ const techs = [
   {
     name: "Nginx",
     src: "https://codersgyan.com/icons/icon-nginx.svg",
-    col: "col-start-2",
+    col: "col-start-1",
     row: "row-start-2",
   },
   {
     name: "React",
     src: "https://codersgyan.com/icons/icon-react.svg",
-    col: "col-start-4",
+    col: "col-start-3",
     row: "row-start-3",
   },
   {
@@ -48,39 +48,75 @@ const techs = [
   {
     name: "Next.js",
     src: "https://codersgyan.com/icons/icon-next.svg",
+    col: "col-start-6",
+    row: "row-start-5",
+  },
+  {
+    name: "Next.js",
+    src: "https://codersgyan.com/icons/icon-node.svg",
+    col: "col-start-6",
+    row: "row-start-3",
+  },
+  {
+    name: "Empty",
+    col: "col-start-4",
+    row: "row-start-2",
+    className: "opacity-70",
+  },
+  {
+    name: "Empty",
+    col: "col-start-2",
+    row: "row-start-3",
+    className: "opacity-70",
+  },
+  {
+    name: "Empty",
+    col: "col-start-4",
+    row: "row-start-3",
+    className: "opacity-70",
+  },
+  {
+    name: "Empty",
     col: "col-start-5",
     row: "row-start-5",
+    className: "opacity-70",
   },
 ];
 
 export default function IconGrid() {
   return (
     <div className="min-h-screen grid place-items-center bg-radial-dark">
-      <div className="grid grid-cols-5 grid-rows-5 gap-5">
-        {techs.map((t) => (
+      <div className="grid grid-cols-6 grid-rows-5 mask-b-from-70% to-100%">
+        {techs.map((t, idx) => (
           <div
-            key={t.name}
+            key={idx}
             className={`
               relative ${t.col} ${t.row}
-              h-28 w-28
-              border border-dashed border-white/15
-              bg-white/3
+              h-24 w-24
+              border border-dashed border-white/10
+              bg-neutral-100/1
               backdrop-blur-md
               grid place-items-center
               transition-all duration-300
-              hover:-translate-y-1 hover:scale-105
-              hover:border-white/40
-              hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)]
+              ${t.className ?? ""}
             `}
           >
-            <Image
-              src={t.src}
-              alt={t.name}
-              width={44}
-              height={44}
-              draggable={false}
-              className="opacity-90"
-            />
+            {t.src && (
+              <>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="h-14 w-14 rounded-full bg-white/5 blur-xl opacity-30" />
+                </div>
+
+                <Image
+                  src={t.src}
+                  alt={t.name}
+                  width={44}
+                  height={44}
+                  draggable={false}
+                  className="relative z-10 opacity-80 drop-shadow-[0_0_6px_rgba(255,255,255,0.35)]"
+                />
+              </>
+            )}
           </div>
         ))}
       </div>
