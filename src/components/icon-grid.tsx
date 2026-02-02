@@ -1,6 +1,5 @@
 "use client";
-
-import Image from "next/image";
+import { motion } from "motion/react";
 
 const techs = [
   {
@@ -85,16 +84,16 @@ const techs = [
 
 export default function IconGrid() {
   return (
-    <div className="min-h-screen grid place-items-center bg-radial-dark">
-      <div className="grid grid-cols-6 grid-rows-5 mask-b-from-70% to-100%">
+    <div className="min-h-screen grid place-items-center p-5 bg-orange-50 dark:bg-background w-full">
+      <div className="grid grid-cols-6 grid-rows-5 mask-b-from-60% to-100%">
         {techs.map((t, idx) => (
           <div
             key={idx}
             className={`
               relative ${t.col} ${t.row}
               h-24 w-24
-              border border-dashed border-white/10
-              bg-neutral-100/1
+              border border-dashed dark:border-white/10 border-neutral-900/14
+              dark:bg-neutral-100/1 bg-neutral-900/1
               backdrop-blur-md
               grid place-items-center
               transition-all duration-300
@@ -104,16 +103,27 @@ export default function IconGrid() {
             {t.src && (
               <>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="h-14 w-14 rounded-full bg-white/5 blur-xl opacity-30" />
+                  <div className="h-14 w-14 rounded-full dark:bg-white/5 bg-neutral-900/5 blur-xl opacity-30" />
                 </div>
 
-                <Image
+                <motion.img
+                  animate={{
+                    scale: [0.3, 1, 1, 0],
+                    opacity: [0, 1, 1, 0],
+                  }}
+                  transition={{
+                    times: [0, 0.2, 0.7, 1],
+                    ease: "easeInOut",
+                    duration: 4,
+                    delay: idx * 0.7,
+                    repeat: Infinity,
+                  }}
                   src={t.src}
                   alt={t.name}
                   width={44}
                   height={44}
                   draggable={false}
-                  className="relative z-10 opacity-80 drop-shadow-[0_0_6px_rgba(255,255,255,0.35)]"
+                  className="relative z-10 opacity-80 dark:drop-shadow-[0_0_6px_rgba(255,255,255,0.35)] drop-shadow-[0_0_6px_rgba(0,0,0,0.25)]"
                 />
               </>
             )}
