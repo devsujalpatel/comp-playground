@@ -1,4 +1,4 @@
-import { IconGrid } from "@/components/icon-grid";
+import IconGrid from "@/components/icon-grid";
 import { ToggleThemeBtn } from "@/components/toggle-theme-btn";
 
 export default function Page() {
