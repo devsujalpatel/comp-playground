@@ -43,14 +43,14 @@ export const AceBento = () => {
               </div>
             </div>
             {/* Desktop */}
-            <div className="w-[90%] lg:w-72 ml-4 h-60 rounded-t-md border border-b-0 border-neutral-200">
+            <div className="w-[90%] overflow-hidden lg:w-72 ml-4 h-60 rounded-t-md border border-b-0 border-neutral-200">
               {/* Header */}
-              <div className="flex items-center justify-start gap-1 p-1 px-2 border-b bg-neutral-50 rounded-t-md border-neutral-200">
+              <div className="flex items-center  justify-start gap-1 p-1 px-2 border-b bg-neutral-50 rounded-t-md border-neutral-200">
                 <div className="w-1 h-1 rounded-full bg-red-400" />
                 <div className="w-1 h-1 rounded-full bg-yellow-400" />
                 <div className="w-1 h-1 rounded-full bg-emerald-400" />
               </div>
-              <div className=""></div>
+              <div className="bg-[radial-gradient(#314158_1px,transparent_1px)] bg-slate-950 bg-size-[16px_16px] w-full h-full"></div>
             </div>
           </div>
         </div>
