@@ -1,4 +1,5 @@
 import { AppWindowMac } from "lucide-react";
+import Image from "next/image";
 
 export const AceBento = () => {
   return (
@@ -50,7 +51,31 @@ export const AceBento = () => {
                 <div className="w-1 h-1 rounded-full bg-yellow-400" />
                 <div className="w-1 h-1 rounded-full bg-emerald-400" />
               </div>
-              <div className="bg-[radial-gradient(#314158_1px,transparent_1px)] bg-slate-950 bg-size-[16px_16px] w-full h-full"></div>
+              <div className="bg-[radial-gradient(#31415844_1px,transparent_1px)] flex items-center justify-start flex-col relative bg-slate-950 bg-size-[16px_16px] w-full h-full">
+                <div className="flex item-start justify-between absolute -top-20">
+                  <Image
+                    src="/gradient-left.png"
+                    width={150}
+                    height={180}
+                    alt="Gradient image"
+                  />
+                  <Image
+                    src="/gradient-right.png"
+                    width={150}
+                    height={180}
+                    alt="Gradient image"
+                  />
+                </div>
+                <h3 className="z-50 mt-10 text-md text-center font-bold bg-clip-text text-transparent bg-linear-to-br from-neutral-200 to-gray-400">Websites that stand out <br /> and make a difference</h3>
+                 <div className="flex text-[6px] space-x-2 mt-4 items-center justify-center z-50">
+                  <button className="bg-linear-to-br from-purple-500 rounded-xs to-indigo-600 w-14 text-white px-2 py-1 text-center">
+                    Get started
+                  </button>
+                  <button className="border border-neutral-600 text-white rounded-xs w-14 text-black px-2 py-1 text-center">
+                    Read more
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
