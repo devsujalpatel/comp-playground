@@ -22,7 +22,7 @@ export const BrandsMarque = ({
       speed={50}
       play={isHovered}
       direction={direction}
-      className="mx-5 py-5 z-20"
+      className="mx-5 py-6 z-20"
     >
       {brand.map(({ brandIcon, brandName }: BrandProps, idx: number) => (
         <div
