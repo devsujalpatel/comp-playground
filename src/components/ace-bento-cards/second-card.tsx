@@ -1,6 +1,6 @@
 "use client";
 
-import { brands, brands2, brands3 } from "@/constants";
+import { brands, brands2, brands3, rings } from "@/constants";
 import { CloudIcon, Code2Icon } from "lucide-react";
 // import { motion } from "motion/react";
 import { useState } from "react";
@@ -48,46 +48,17 @@ export const SecondCard = () => {
         </div>
       </div>
       <div className="absolute bottom-0 flex items-center justify-center z-10">
+       {rings.map((ring, idx) => (
         <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "0rem", height: "0rem", opacity: 1 }}
+          key={idx}
+          className="absolute left-1/2 -translate-x-1/2 rounded-full border border-slate-200"
+          style={{
+            width: `${ring.size}rem`,
+            height: `${ring.size}rem`,
+            opacity: ring.opacity,
+          }}
         />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "4rem", height: "4rem", opacity: "0.9" }}
-        />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "8rem", height: "8rem", opacity: "0.8" }}
-        />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "12rem", height: "12rem", opacity: "0.7" }}
-        />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "16rem", height: "16rem", opacity: "0.6" }}
-        />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "20rem", height: "20rem", opacity: "0.5" }}
-        />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "24rem", height: "24rem", opacity: "0.4" }}
-        />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "28rem", height: "28rem", opacity: "0.3" }}
-        />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "32rem", height: "32rem", opacity: "0.2" }}
-        />
-        <div
-          className="absolute left-1/2 -translate-x-1/2  rounded-full border border-slate-200"
-          style={{ width: "36rem", height: "36rem", opacity: "0.1" }}
-        />
+      ))}
         <div
           className=" absolute left-1/2 -top-32 -translate-x-1/2 w-80 h-80 rounded-full bg-violet-300 opacity-20
     blur-3xl z-50"

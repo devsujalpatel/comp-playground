@@ -113,3 +113,22 @@ export const brands3: BrandProps[] = [
     brandName: "AWS",
   },
 ];
+
+
+export type RingConfig = {
+  size: number 
+  opacity: number
+}
+
+export const rings: RingConfig[] = [
+  { size: 0, opacity: 1 },
+  { size: 4, opacity: 0.9 },
+  { size: 8, opacity: 0.8 },
+  { size: 12, opacity: 0.7 },
+  { size: 16, opacity: 0.6 },
+  { size: 20, opacity: 0.5 },
+  { size: 24, opacity: 0.4 },
+  { size: 28, opacity: 0.3 },
+  { size: 32, opacity: 0.2 },
+  { size: 36, opacity: 0.1 },
+]
