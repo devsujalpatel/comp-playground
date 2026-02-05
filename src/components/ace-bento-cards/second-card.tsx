@@ -5,6 +5,10 @@ import { CloudIcon, Code2Icon } from "lucide-react";
 // import { motion } from "motion/react";
 import { useState } from "react";
 import { BrandsMarque } from "../brands-marque";
+import { BentoHeading } from "../util-comps/bento-heading";
+import { BentoPara } from "../util-comps/bento-para";
+import { BentoIcon } from "../util-comps/bento-icon";
+import { BentoHeaderCard } from "../util-comps/bento-header-card";
 
 export const SecondCard = () => {
   const [hovered, setHovered] = useState<boolean>(false);
@@ -16,18 +20,16 @@ export const SecondCard = () => {
       className="row-span-2 relative flex flex-col items-center justify-start group shadow-ace rounded-xl overflow-hidden h-full"
     >
       {/* Headee */}
-      <div className="flex z-20 flex-col p-4 items-start w-full mb-6">
-        <div className="bg-black flex justify-center items-center size-8 text-white p-2 rounded-full">
+      <BentoHeaderCard className="mb-6">
+        <BentoIcon>
           <CloudIcon className="size-3.5" />
-        </div>
-        <h2 className="text-lg font-semibold bg-clip-text mt-4 text-transparent bg-linear-to-b from-neutral-700 to-neutral-500">
-          Hosting, deployment and maintenance
-        </h2>
-        <p className="text-sm text-neutral-500 max-w-sm mt-4 font-outfit font-normal ">
+        </BentoIcon>
+        <BentoHeading>Hosting, deployment and maintenance</BentoHeading>
+        <BentoPara>
           We'll Get your website out there in the world, where it belongs, with
           our lightning-fast deployment services.
-        </p>
-      </div>
+        </BentoPara>
+      </BentoHeaderCard>
       {/* Marques */}
       <BrandsMarque brand={brands} direction="left" isHovered={hovered} />
       <BrandsMarque brand={brands2} direction="right" isHovered={hovered} />
@@ -87,7 +89,7 @@ export const SecondCard = () => {
           style={{ width: "36rem", height: "36rem", opacity: "0.1" }}
         />
         <div
-          className=" absolute left-1/2 -top-32 -translate-x-1/2 w-80 h-80 rounded-full bg-violet-300 opacity-25
+          className=" absolute left-1/2 -top-32 -translate-x-1/2 w-80 h-80 rounded-full bg-violet-300 opacity-20
     blur-3xl z-50"
         />
       </div>
