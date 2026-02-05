@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { motion } from "motion/react";
+import Marquee from "react-fast-marquee";
 
 export interface BrandProps {
   brandIcon: React.ReactElement;
@@ -10,25 +9,25 @@ export interface BrandProps {
 export interface BrandsMarqueProps {
   direction: "left" | "right";
   brand: BrandProps[];
+  isHovered?: boolean;
 }
 
-export const BrandsMarque = ({ brand, direction }: BrandsMarqueProps) => {
+export const BrandsMarque = ({
+  brand,
+  direction,
+  isHovered,
+}: BrandsMarqueProps) => {
   return (
-    <motion.div
-      animate={{
-        x: direction === "left" ? ["0%", "-50%"] : ["-50%", "0%"],
-      }}
-      transition={{
-        duration: 10,
-        ease: "linear",
-        repeat: Infinity,
-      }}
-      className="flex gap-4 items-center justify-center w-full mx-5 mb-10"
+    <Marquee
+      speed={50}
+      play={isHovered}
+      direction={direction}
+      className="mx-5 mb-10 py-3"
     >
       {brand.map(({ brandIcon, brandName }: BrandProps, idx: number) => (
         <div
           key={idx}
-          className="flex gap-1 items-center justify-between px-5 mx-auto py-1 w-40 shadow-ace rounded-sm"
+          className="flex gap-1 items-center justify-between px-5 py-1 shadow-ace rounded-sm mx-4"
         >
           <div className="size-4 shrink-0">{brandIcon}</div>
           <p className="text-sm font-outfit leading-none whitespace-nowrap w-full">
@@ -36,6 +35,6 @@ export const BrandsMarque = ({ brand, direction }: BrandsMarqueProps) => {
           </p>
         </div>
       ))}
-    </motion.div>
+    </Marquee>
   );
 };

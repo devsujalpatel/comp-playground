@@ -1,41 +1,20 @@
-import { CloudIcon } from "lucide-react";
-import { BrandProps, BrandsMarque } from "../brands-marque";
-import RedisIcon from "../icons/redis";
-import VercelIcon from "../icons/vercel";
-import TailwindIcon from "../icons/tailwind";
-import FramerIcon from "../icons/framer";
-import AwsIcon from "../icons/aws";
+"use client";
 
-const brands: BrandProps[] = [
-  {
-    brandIcon: <RedisIcon className="size-4" />,
-    brandName: "Redis",
-  },
-  {
-    brandIcon: <VercelIcon className="size-4" />,
-    brandName: "Vercel",
-  },
-  {
-    brandIcon: <TailwindIcon className="size-4" />,
-    brandName: "Tailwind CSS",
-  },
-  {
-    brandIcon: <FramerIcon className="size-4" />,
-    brandName: "Framer Motion",
-  },
-  {
-    brandIcon: <AwsIcon className="size-4" />,
-    brandName: "AWS",
-  },
-  {
-    brandIcon: <VercelIcon className="size-4" />,
-    brandName: "Vercel",
-  },
-];
+import { brands } from "@/constants";
+import { CloudIcon } from "lucide-react";
+// import { motion } from "motion/react";
+import { useState } from "react";
+import { BrandsMarque } from "../brands-marque";
 
 export const SecondCard = () => {
+  const [hovered, setHovered] = useState<boolean>(false);
+
   return (
-    <div className="row-span-2 flex flex-col items-center justify-center shadow-ace rounded-xl overflow-hidden">
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="row-span-2 flex flex-col items-center justify-center group shadow-ace rounded-xl overflow-hidden"
+    >
       {/* Headee */}
       <div className="flex flex-col p-4 items-start w-full">
         <div className="bg-black flex justify-center items-center size-8 text-white p-2 rounded-full">
@@ -49,7 +28,7 @@ export const SecondCard = () => {
           our lightning-fast deployment services.
         </p>
       </div>
-      <BrandsMarque brand={brands} direction="left" />
+      <BrandsMarque brand={brands} direction="left" isHovered={hovered} />
       <div></div>
     </div>
   );
