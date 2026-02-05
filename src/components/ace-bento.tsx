@@ -1,4 +1,5 @@
-import { FirstCard } from "./ace-bento-cards/first-card"
+import { FirstCard } from "./ace-bento-cards/first-card";
+import { SecondCard } from "./ace-bento-cards/second-card";
 
 export const AceBento = () => {
   return (
@@ -7,7 +8,7 @@ export const AceBento = () => {
         {/*  First Grid Card */}
         <FirstCard />
 
-        <div className="bg-green-200 row-span-2"></div>
+        <SecondCard />
 
         <div className="bg-blue-200 row-span-2"></div>
 

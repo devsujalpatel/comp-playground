@@ -66,8 +66,8 @@ export const FirstCard = () => {
                  <div className="flex text-[6px] space-x-2 mt-4 items-center justify-center z-50">
                   <button className="bg-linear-to-br from-purple-500 rounded-xs to-indigo-600 w-14 text-white px-2 py-1 text-center">
                     Get started
-                  </button>
-                  <button className="border border-neutral-600 text-white rounded-xs w-14 text-black px-2 py-1 text-center">
+                  </button> 
+                  <button className="border border-neutral-600 rounded-xs w-14 text-black px-2 py-1 text-center">
                     Read more
                   </button>
                 </div>
