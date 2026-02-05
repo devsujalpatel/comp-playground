@@ -1,5 +1,6 @@
 import { FirstCard } from "./ace-bento-cards/first-card";
 import { SecondCard } from "./ace-bento-cards/second-card";
+import { ThirdCard } from "./ace-bento-cards/third-card";
 
 export const AceBento = () => {
   return (
@@ -10,7 +11,7 @@ export const AceBento = () => {
 
         <SecondCard />
 
-        <div className="bg-blue-200 row-span-2"></div>
+        <ThirdCard />
 
         <div className="bg-yellow-200"></div>
         <div className="lg:col-span-2 row-span-2 bg-emerald-200"></div>
