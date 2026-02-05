@@ -42,3 +42,74 @@ export const brands: BrandProps[] = [
     brandName: "Digital Ocean",
   },
 ];
+export const brands2: BrandProps[] = [
+  {
+    brandIcon: <RedisIcon className="size-4" />,
+    brandName: "Redis",
+  },
+
+  {
+    brandIcon: <TailwindIcon className="size-4" />,
+    brandName: "Tailwind CSS",
+  },
+  {
+    brandIcon: <DigitalOceanIcon />,
+    brandName: "Digital Ocean",
+  },
+  {
+    brandIcon: <GithubIcon className="size-4" />,
+    brandName: "Github",
+  },
+  {
+    brandIcon: <FramerIcon className="size-4" />,
+    brandName: "Framer Motion",
+  },
+  {
+    brandIcon: <AwsIcon className="size-4" />,
+    brandName: "AWS",
+  },
+
+  {
+    brandIcon: <VercelIcon className="size-4" />,
+    brandName: "Vercel",
+  },
+  {
+    brandIcon: <DockerIcon className="size-4" />,
+    brandName: "Docker",
+  },
+];
+export const brands3: BrandProps[] = [
+  {
+    brandIcon: <FramerIcon className="size-4" />,
+    brandName: "Framer Motion",
+  },
+  {
+    brandIcon: <VercelIcon className="size-4" />,
+    brandName: "Vercel",
+  },
+  {
+    brandIcon: <TailwindIcon className="size-4" />,
+    brandName: "Tailwind CSS",
+  },
+
+  {
+    brandIcon: <GithubIcon className="size-4" />,
+    brandName: "Github",
+  },
+  {
+    brandIcon: <RedisIcon className="size-4" />,
+    brandName: "Redis",
+  },
+  {
+    brandIcon: <DigitalOceanIcon />,
+    brandName: "Digital Ocean",
+  },
+  {
+    brandIcon: <DockerIcon className="size-4" />,
+    brandName: "Docker",
+  },
+  {
+    brandIcon: <AwsIcon className="size-4" />,
+    brandName: "AWS",
+  },
+];
