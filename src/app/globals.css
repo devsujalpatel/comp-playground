@@ -90,7 +90,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.87 0.00 0);
+  --primary: oklch(0.87 0 0);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -118,10 +118,10 @@
 }
 
 @theme inline {
-    --shadow-ace: 
-    0px 2px 3px -1px rgba(0, 0, 0, 0.1),
-    0px 1px 0px 0px rgba(25, 28, 33, 0.02),
+  --shadow-ace:
+    0px 2px 3px -1px rgba(0, 0, 0, 0.1), 0px 1px 0px 0px rgba(25, 28, 33, 0.02),
     0px 0px 0px 1px rgba(25, 28, 33, 0.08);
+  --font-signika: var(--font-signika);
 }
 
 @layer base {
@@ -132,4 +132,3 @@
     @apply bg-background text-foreground;
   }
 }
-
