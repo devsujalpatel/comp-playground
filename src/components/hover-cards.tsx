@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 interface Card {
@@ -38,7 +38,7 @@ export const HoverCards = () => {
       skeleton: (
         <div className="h-50 rounded-lg bg-linear-to-r from-neutral-300 to-stone-300/60 w-full"></div>
       ),
-      className: "bg-stone-200 [&_h2]:text-black",
+      className: "bg-stone-200 [&_h2]:text-black [&_p]:text-neutral-600/80",
       config: {
         y: 20,
         x: 180,
@@ -109,8 +109,6 @@ export const HoverCards = () => {
 
   const isCurrentActive = (card: Card) => active?.title === card.title;
 
-  
-
   return (
     <div ref={ref} className="max-w-5xl mx-auto w-full h-160 relative">
       {cards.map((card, index) => (
@@ -124,22 +122,40 @@ export const HoverCards = () => {
               filter: "blur(10px)",
             }}
             animate={{
-              y: card.config.y,
-              x: card.config.x,
-              zIndex: card.config.zIndex,
-              rotate: card.config.rotate,
-              scale: 1,
-              width: 320,
-              height: 400,
+              y: isCurrentActive(card)
+                ? 0
+                : isAnyCardActive()
+                  ? 340
+                  : card.config.y,
+              x: isCurrentActive(card)
+                ? 320
+                : isAnyCardActive()
+                  ? card.config.x * 0.6 + 160
+                  : card.config.x,
+              rotate: isCurrentActive(card)
+                ? 0
+                : isAnyCardActive()
+                  ? card.config.rotate * 0.4
+                  : card.config.rotate,
+              scale: isCurrentActive(card) ? 1 : isAnyCardActive() ? 0.7 : 1,
+              width: isCurrentActive(card) ? 400 : 320,
+              height: isCurrentActive(card) ? 500 : 400,
               filter: "blur(0px)",
             }}
             whileHover={{
-              scale: 1.05,
+              scale: isCurrentActive(card)
+                ? 1
+                : isAnyCardActive()
+                  ? 0.71
+                  : 1.05,
             }}
             transition={{
               type: "spring",
               stiffness: 100,
               damping: 15,
+            }}
+            style={{
+              zIndex: active?.config.zIndex,
             }}
             className={cn(
               "w-80 p-8 absolute inset-0 rounded-2xl flex flex-col items-start justify-between overflow-hidden cursor-pointer",
@@ -148,9 +164,25 @@ export const HoverCards = () => {
           >
             {card.skeleton}
             <div>
-              <h2 className="text-2xl font-bold text-white font-signika text-left">
+              <motion.h2
+                layoutId={card.title + "title"}
+                className="text-2xl font-bold text-white font-signika text-left"
+              >
                 {card.title}
-              </h2>
+              </motion.h2>
+              <AnimatePresence mode="popLayout">
+                {isAnyCardActive() && (
+                  <motion.p
+                    layoutId={card.title + "desc"}
+                    initial={{ opacity: 0, x: 20, y: 20, height: 0 }}
+                    animate={{ opacity: 1, x: 0, y: 0, height: 100 }}
+                    exit={{ opacity: 0, x: 40, y: 40, height: 0 }}
+                    className="text-white/80 text-lg mt-3 text-left"
+                  >
+                    {card.desc}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
           </motion.button>
         </motion.div>
