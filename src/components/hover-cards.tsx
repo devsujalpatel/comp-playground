@@ -139,7 +139,7 @@ export const HoverCards = () => {
                   : card.config.rotate,
               scale: isCurrentActive(card) ? 1 : isAnyCardActive() ? 0.7 : 1,
               width: isCurrentActive(card) ? 400 : 320,
-              height: isCurrentActive(card) ? 500 : 400,
+              height: isCurrentActive(card) ? 450 : 400,
               filter: "blur(0px)",
             }}
             whileHover={{
@@ -158,7 +158,7 @@ export const HoverCards = () => {
               zIndex: active?.config.zIndex,
             }}
             className={cn(
-              "w-80 p-8 absolute inset-0 rounded-2xl flex flex-col items-start justify-between overflow-hidden cursor-pointer",
+              "w-80 p-8 absolute inset-0 rounded-2xl flex flex-col items-start justify-start overflow-hidden cursor-pointer gap-8",
               card.className,
             )}
           >
@@ -174,9 +174,9 @@ export const HoverCards = () => {
                 {isAnyCardActive() && (
                   <motion.p
                     layoutId={card.title + "desc"}
-                    initial={{ opacity: 0, x: 20, y: 20, height: 0 }}
-                    animate={{ opacity: 1, x: 0, y: 0, height: 100 }}
-                    exit={{ opacity: 0, x: 40, y: 40, height: 0 }}
+                    initial={{ opacity: 0, x: 20, y: 20, height: 0,   filter: "blur(10px)", }}
+                    animate={{ opacity: 1, x: 0, y: 0, height: 100, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, x: 40, y: 40, height: 0, filter: "blur(10px)" }}
                     className="text-white/80 text-lg mt-3 text-left"
                   >
                     {card.desc}
