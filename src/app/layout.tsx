@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import "./globals.css";
-import { Geist, Geist_Mono, Inter, Outfit } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
 
+import { Geist, Geist_Mono, Inter, Outfit, Signika } from "next/font/google";
+import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+
+const signika = Signika({
+  subsets: ["latin"],
+  variable: "--font-signika",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${signika.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"

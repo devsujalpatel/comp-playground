@@ -26,8 +26,8 @@ export const FirstCard = () => {
         {/* Mobile */}
         <div className="w-40 h-60 border-4 border-b-0 border-neutral-100 rounded-t-xl flex flex-col items-center p-4">
           {/* Header */}
-          <div className="w-16 h-4 rounded-full bg-neutral-100 flex items-center justify-end p-1">
-            <div className="bg-neutral-200 rounded-full w-2 h-2"></div>
+          <div className="w-16 h-4 rounded-full bg-neutral-200/60 flex items-center justify-end p-1">
+            <div className="bg-neutral-300/80 rounded-full w-2 h-2"></div>
           </div>
           {/* Middle */}
           <div className="flex flex-col item-center justify-center mt-16">
@@ -74,7 +74,7 @@ export const FirstCard = () => {
               <button className="bg-linear-to-br from-purple-500 rounded-xs to-indigo-600 w-14 text-white px-2 py-1 text-center">
                 Get started
               </button>
-              <button className="border border-neutral-600 rounded-xs w-14 text-black px-2 py-1 text-center">
+              <button className="border border-neutral-600 rounded-xs w-14 text-neutral-100 px-2 py-1 text-center">
                 Read more
               </button>
             </div>
