@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Water Ripple — WebGL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@200;300;400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #020814;
+        cursor: none;
+      }
+
+      #webgl-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      /* ── Overlay UI ──────────────────────────────────────────────────────── */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 10;
+        user-select: none;
+      }
+
+      .title {
+        font-family: "Cormorant Garamond", "Garamond", Georgia, serif;
+        font-size: clamp(4rem, 12vw, 10rem);
+        font-weight: 200;
+        color: rgba(160, 225, 255, 0.65);
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        text-shadow:
+          0 0 40px rgba(60, 160, 255, 0.55),
+          0 0 100px rgba(30, 100, 255, 0.2),
+          0 2px 8px rgba(0, 0, 0, 0.6);
+        animation: surfaceSway 8s ease-in-out infinite;
+      }
+
+      .subtitle {
+        margin-top: 1.2rem;
+        font-family: "Cormorant Garamond", Georgia, serif;
+        font-size: clamp(0.55rem, 1.4vw, 0.8rem);
+        font-weight: 400;
+        letter-spacing: 0.65em;
+        color: rgba(100, 195, 255, 0.3);
+        text-transform: uppercase;
+      }
+
+      @keyframes surfaceSway {
+        0%,
+        100% {
+          transform: translateY(0px);
+          opacity: 0.65;
+        }
+        50% {
+          transform: translateY(-6px);
+          opacity: 0.85;
+        }
+      }
+
+      .hint {
+        position: fixed;
+        bottom: 2.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: "Cormorant Garamond", Georgia, serif;
+        font-size: 0.65rem;
+        letter-spacing: 0.45em;
+        color: rgba(100, 185, 255, 0.22);
+        text-transform: uppercase;
+        animation: breathe 5s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 10;
+        white-space: nowrap;
+      }
+
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* ── Custom cursor ───────────────────────────────────────────────────── */
+      #cursor {
+        position: fixed;
+        width: 16px;
+        height: 16px;
+        border: 1.5px solid rgba(120, 210, 255, 0.8);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        transition:
+          width 0.15s ease,
+          height 0.15s ease,
+          border-color 0.2s;
+        mix-blend-mode: screen;
+      }
+      #cursor.active {
+        width: 38px;
+        height: 38px;
+        border-color: rgba(160, 235, 255, 1);
+      }
+
+      /* ── Splash ring (CSS + GSAP) ────────────────────────────────────────── */
+      .splash {
+        position: fixed;
+        border-radius: 50%;
+        border: 1.5px solid rgba(130, 220, 255, 0.85);
+        transform: translate(-50%, -50%) scale(1);
+        pointer-events: none;
+        z-index: 8;
+        width: 8px;
+        height: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="webgl-canvas"></canvas>
+    <div id="cursor"></div>
+
+    <div class="overlay">
+      <h1 class="title">DEEP</h1>
+      <p class="subtitle">WebGL Water Surface — Click to Ripple</p>
+    </div>
+
+    <p class="hint">Touch the water &nbsp;·&nbsp; Anywhere</p>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+      "use strict";
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  CONFIG
+      // ═══════════════════════════════════════════════════════════════════════════
+      const MAX_RIPPLES = 16;
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  GLSL SHADERS
+      // ═══════════════════════════════════════════════════════════════════════════
+      const vertexShader = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+      const fragmentShader = /* glsl */ `
+  precision highp float;
+  #define MAX_RIPPLES 16
+  #define PI  3.14159265358979
+  #define TAU 6.28318530717959
+
+  uniform float     time;
+  uniform vec2      resolution;
+  uniform int       rippleCount;
+  // .xy = UV position (0‥1), .z = progress (0‥1), .w = unused (amplitude driven by shader)
+  uniform vec4      ripples[MAX_RIPPLES];
+
+  varying vec2 vUv;
+
+  // ── Hashes ───────────────────────────────────────────────────────────────
+  float hash11(float p) {
+    p = fract(p * 0.1031);
+    p *= p + 33.33;
+    return fract(p * (p + p));
+  }
+
+  float hash21(vec2 p) {
+    vec3 p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+  }
+
+  // ── Value noise ──────────────────────────────────────────────────────────
+  float vnoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(
+      mix(hash21(i),             hash21(i + vec2(1,0)), f.x),
+      mix(hash21(i + vec2(0,1)), hash21(i + vec2(1,1)), f.x),
+    f.y);
+  }
+
+  // ── FBM ──────────────────────────────────────────────────────────────────
+  float fbm4(vec2 p) {
+    float v = 0.0, a = 0.5;
+    for (int i = 0; i < 4; i++) {
+      v += a * vnoise(p);
+      p  = p * 2.03 + vec2(7.1, -3.7);
+      a *= 0.5;
+    }
+    return v;
+  }
+
+  // ── Caustic light simulation ─────────────────────────────────────────────
+  // Two turbulent noise layers interfere → bright veins where they coincide
+  float caustic(vec2 uv, float t) {
+    vec2 p   = uv * 3.5;
+    float n1 = fbm4(p + vec2( t * 0.10,  t * 0.07));
+    float n2 = fbm4(p + vec2(-t * 0.08,  t * 0.13) + vec2(3.2, 1.7));
+    float diff = abs(n1 - n2);
+    // Bright veins where surfaces are close
+    float c = 1.0 - smoothstep(0.0, 0.28, diff);
+    return pow(c, 4.0);
+  }
+
+  // ── Hex tile for a subtle tessellation ───────────────────────────────────
+  float hexGrid(vec2 uv) {
+    vec2 p = uv * vec2(28.0, 28.0 * 1.1547); // hexagonal scaling
+    vec2 a = mod(p,       vec2(2.0)) - 1.0;
+    vec2 b = mod(p + 1.0, vec2(2.0)) - 1.0;
+    float ha = length(a);
+    float hb = length(b);
+    float d  = min(ha, hb) - 0.85;
+    return smoothstep(0.05, 0.00, d) * 0.07;
+  }
+
+  void main() {
+    vec2  uv     = vUv;
+    float aspect = resolution.x / resolution.y;
+
+    // ── Ripple distortion accumulation ────────────────────────────────────
+    vec2  disp        = vec2(0.0);
+    float surfHeight  = 0.0;   // net surface-height for lighting
+    float frontGlow   = 0.0;   // sum of wave-front luminance contribution
+
+    for (int i = 0; i < MAX_RIPPLES; i++) {
+      if (i >= rippleCount) break;
+
+      vec2  center = ripples[i].xy;
+      float prog   = ripples[i].z;   // 0 → 1
+
+      // Aspect-corrected offset
+      vec2  delta  = (uv - center) * vec2(aspect, 1.0);
+      float dist   = length(delta);
+
+      // ── Wave kinematics ──────────────────────────────────────────────
+      float speed  = 2.4;         // how fast the front expands (in UV units)
+      float waveR  = prog * speed;
+
+      // Signed distance from the current wave front
+      float sd     = dist - waveR;
+
+      // Temporal fade — amplitude collapses as progress → 1
+      float tFade  = pow(max(0.0, 1.0 - prog), 1.6);
+
+      // Spatial envelope centred on wave front (narrow travelling ring)
+      float env    = exp(-pow(sd * 14.0, 2.0));
+
+      // Trailing wake behind front (exponential tail)
+      float wake   = exp( max(0.0, -sd) * 10.0 )
+                   * exp(-max(0.0,  sd - 0.05) * 18.0 );
+      float totalEnv = max(env, wake * 0.35);
+
+      // Multi-frequency oscillation (fundamental + harmonic for realism)
+      float osc = sin(sd * 55.0 - prog * 4.0) * 0.70
+                + sin(sd * 27.0 - prog * 2.0) * 0.30;
+
+      // Surface height contribution
+      float h = osc * totalEnv * tFade * 0.020;
+      surfHeight += h;
+
+      // UV displacement (gradient of height field → radial direction)
+      if (dist > 0.001) {
+        vec2 dir  = delta / dist;          // unit vector (aspect-space)
+        dir       = vec2(dir.x / aspect, dir.y); // back to UV space
+        disp     += dir * h;
+      }
+
+      // Wave-front glow (ring of light at the advancing front)
+      frontGlow += env * tFade * 0.7;
+    }
+
+    // ── Distorted UV (clamped to avoid edge artefacts) ───────────────────
+    vec2 dUv  = clamp(uv + disp, 0.001, 0.999);
+
+    // Chromatic aberration — slight RGB split proportional to displacement
+    float aberr  = length(disp) * 3.5;
+    vec2  dUvR   = clamp(uv + disp * (1.0 + aberr * 0.5), 0.001, 0.999);
+    vec2  dUvB   = clamp(uv + disp * (1.0 - aberr * 0.5), 0.001, 0.999);
+
+    // ── Background: deep ocean ────────────────────────────────────────────
+    vec3 colAbyss   = vec3(0.003, 0.015, 0.060);
+    vec3 colDeep    = vec3(0.010, 0.065, 0.185);
+    vec3 colMid     = vec3(0.025, 0.145, 0.330);
+    vec3 colShallow = vec3(0.055, 0.265, 0.490);
+
+    float dy = dUv.y + fbm4(dUv * 2.0 + time * 0.03) * 0.06;  // wavy gradient
+    vec3 base = mix(colAbyss,   colDeep,    smoothstep(0.00, 0.30, dy));
+    base      = mix(base,       colMid,     smoothstep(0.25, 0.65, dy));
+    base      = mix(base,       colShallow, smoothstep(0.60, 1.00, dy));
+
+    // ── Caustic light (chromatic channels) ───────────────────────────────
+    float cR = caustic(dUvR, time * 0.55);
+    float cG = caustic(dUv,  time * 0.55);
+    float cB = caustic(dUvB, time * 0.55);
+    vec3  cLight = vec3(cR, cG, cB);
+
+    // Caustics strongest near surface (top of screen)
+    float caustStrength = mix(0.15, 0.55, smoothstep(0.3, 0.85, dUv.y));
+    base += cLight * caustStrength;
+
+    // ── Hexagonal grid — deforms beautifully with waves ──────────────────
+    float grid = hexGrid(dUv);
+    base += vec3(0.10, 0.45, 0.75) * grid;
+
+    // ── Surface specular from wave height ─────────────────────────────────
+    //    Approximate surface normal: (0,0,1) perturbed by slope ≈ displacement
+    float spec = max(0.0,  surfHeight * 45.0);
+    float trough = max(0.0, -surfHeight * 35.0);
+    base += vec3(0.50, 0.88, 1.00) * pow(spec, 2.0) * 2.2;
+    base *= 1.0 - trough * 0.35;
+
+    // ── Wave-front glow ring ──────────────────────────────────────────────
+    base += vec3(0.20, 0.65, 1.00) * frontGlow * 0.40;
+
+    // ── Floating particles (bioluminescent plankton drift) ────────────────
+    vec2 drift    = vec2(time * 0.018, time * 0.010);
+    vec2 driftUv  = uv * 65.0 + drift * 65.0;
+    vec2 gId      = floor(driftUv);
+    vec2 gFrac    = fract(driftUv) - 0.5;
+    float pSeed   = hash21(gId);
+    float pExist  = step(0.975, pSeed);          // ~2.5 % of cells
+    float pBright = hash21(gId + 47.3);
+    float pRadius = 0.12 + hash21(gId + 91.1) * 0.12;
+    float pGlow   = smoothstep(pRadius, 0.0, length(gFrac));
+    float pTwinkle= 0.5 + 0.5 * sin(time * (2.0 + pBright * 3.0) + pBright * TAU);
+    base += vec3(0.3, 0.75, 1.0) * pGlow * pExist * pTwinkle * 0.55;
+
+    // ── Light rays from surface (god-rays) ────────────────────────────────
+    float ray = pow(max(0.0, 1.0 - abs(sin(uv.x * 6.0 + time * 0.12 + fbm4(uv * 2.0) * 1.5))), 8.0);
+    ray *= smoothstep(0.0, 0.6, uv.y) * 0.18;
+    base += vec3(0.2, 0.55, 0.9) * ray;
+
+    // ── Vignette ──────────────────────────────────────────────────────────
+    vec2  vigUv  = vUv - 0.5;
+    float vign   = 1.0 - dot(vigUv, vigUv) * 2.4;
+    base        *= smoothstep(-0.1, 0.35, vign);
+
+    // ── Tone-map + gamma ──────────────────────────────────────────────────
+    base  = base / (base + vec3(0.38));          // modified Reinhard
+    base  = pow(clamp(base, 0.0, 1.0), vec3(0.80)); // gamma lift
+
+    gl_FragColor = vec4(base, 1.0);
+  }
+`;
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  THREE.JS SCENE
+      // ═══════════════════════════════════════════════════════════════════════════
+      const canvas = document.getElementById("webgl-canvas");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+      // Ripple uniform arrays
+      const rippleVec4s = [];
+      for (let i = 0; i < MAX_RIPPLES; i++)
+        rippleVec4s.push(new THREE.Vector4(0, 0, 0, 0));
+
+      const uniforms = {
+        time: { value: 0.0 },
+        resolution: {
+          value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+        },
+        rippleCount: { value: 0 },
+        ripples: { value: rippleVec4s },
+      };
+
+      const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(2, 2),
+        new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms }),
+      );
+      scene.add(plane);
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  RIPPLE LOGIC
+      // ═══════════════════════════════════════════════════════════════════════════
+      const activeRipples = []; // { x, y, progress }
+
+      function spawnRipple(clientX, clientY) {
+        // If at capacity, evict the oldest
+        if (activeRipples.length >= MAX_RIPPLES) activeRipples.shift();
+
+        const ripple = {
+          x: clientX / window.innerWidth,
+          y: 1.0 - clientY / window.innerHeight,
+          progress: 0.0,
+        };
+        activeRipples.push(ripple);
+
+        // Animate the wave-front expansion linearly
+        gsap.to(ripple, {
+          progress: 1.0,
+          duration: 3.8,
+          ease: "none",
+          onComplete() {
+            const idx = activeRipples.indexOf(ripple);
+            if (idx !== -1) activeRipples.splice(idx, 1);
+          },
+        });
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  ANIMATION LOOP
+      // ═══════════════════════════════════════════════════════════════════════════
+      const clock = new THREE.Clock();
+
+      (function loop() {
+        requestAnimationFrame(loop);
+
+        uniforms.time.value = clock.getElapsedTime();
+        uniforms.rippleCount.value = activeRipples.length;
+
+        for (let i = 0; i < activeRipples.length; i++) {
+          const r = activeRipples[i];
+          uniforms.ripples.value[i].set(r.x, r.y, r.progress, 1.0);
+        }
+
+        renderer.render(scene, camera);
+      })();
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  INPUT — MOUSE
+      // ═══════════════════════════════════════════════════════════════════════════
+      const cursorEl = document.getElementById("cursor");
+
+      window.addEventListener("mousemove", (e) => {
+        cursorEl.style.left = e.clientX + "px";
+        cursorEl.style.top = e.clientY + "px";
+      });
+
+      window.addEventListener("click", (e) => {
+        spawnRipple(e.clientX, e.clientY);
+        spawnSplashRing(e.clientX, e.clientY);
+
+        cursorEl.classList.add("active");
+        setTimeout(() => cursorEl.classList.remove("active"), 250);
+      });
+
+      // ── Touch support ─────────────────────────────────────────────────────────
+      window.addEventListener(
+        "touchstart",
+        (e) => {
+          for (const t of e.changedTouches) {
+            spawnRipple(t.clientX, t.clientY);
+            spawnSplashRing(t.clientX, t.clientY);
+          }
+        },
+        { passive: true },
+      );
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  SPLASH RING (DOM)  — layered CSS rings animated by GSAP
+      // ═══════════════════════════════════════════════════════════════════════════
+      function spawnSplashRing(x, y) {
+        // Three concentric rings with staggered delay
+        [0, 55, 130].forEach((delay, idx) => {
+          const ring = document.createElement("div");
+          ring.className = "splash";
+          ring.style.left = x + "px";
+          ring.style.top = y + "px";
+          ring.style.opacity = (1 - idx * 0.25).toString();
+          document.body.appendChild(ring);
+
+          gsap.fromTo(
+            ring,
+            { width: 6, height: 6, opacity: 0.7 - idx * 0.2 },
+            {
+              width: 90 + idx * 40,
+              height: 90 + idx * 40,
+              opacity: 0,
+              duration: 0.9 + idx * 0.25,
+              delay: delay / 1000,
+              ease: "power2.out",
+              onComplete() {
+                ring.remove();
+              },
+            },
+          );
+        });
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  RESIZE
+      // ═══════════════════════════════════════════════════════════════════════════
+      window.addEventListener("resize", () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+      });
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      //  INTRO RIPPLE  — spawn a gentle ripple from centre on load
+      // ═══════════════════════════════════════════════════════════════════════════
+      window.addEventListener("load", () => {
+        // Short pause then a ripple from centre
+          spawnRipple(window.innerWidth / 5, window.innerHeight / 4);
+      });
+    </script>
+  </body>
+</html>
