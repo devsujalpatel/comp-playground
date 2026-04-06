@@ -52,7 +52,7 @@ export default function Tunnel() {
 
         const imgEl = document.createElement("img");
         imgEl.classList.add("img");
-        imgEl.src = `/img${imageNumber}.jpg`; // 👈 IMPORTANT FIX
+        imgEl.src = `/3d-image/img${imageNumber}.jpg`;
         imgEl.alt = `Image ${imageNumber}`;
 
         itemEl.appendChild(imgEl);
