@@ -12,7 +12,7 @@ import {
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
-import { SmoothScroller } from "@/components/smooth-scroller";
+import SmoothScroller from "@/components/smooth-scroller";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });

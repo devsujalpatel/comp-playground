@@ -1,12 +1,14 @@
 "use client";
-import { useEffect, useRef, type ReactNode } from "react";
+
 import gsap from "gsap";
 import { ReactLenis, type LenisRef } from "lenis/react";
+import { useEffect, useRef, type ReactNode } from "react";
+
 type SmoothScrollerProps = {
   children: ReactNode;
 };
 
-export const SmoothScroller = ({ children }: SmoothScrollerProps) => {
+export default function SmoothScroller({ children }: SmoothScrollerProps) {
   const lenisRef = useRef<LenisRef | null>(null);
 
   useEffect(() => {
@@ -16,12 +18,20 @@ export const SmoothScroller = ({ children }: SmoothScrollerProps) => {
 
     gsap.ticker.add(update);
 
-    return () => gsap.ticker.remove(update);
+    return () => {
+      gsap.ticker.remove(update);
+    };
   }, []);
 
   return (
-    <ReactLenis ref={lenisRef} options={{ autoRaf: false }} root>
+    <ReactLenis
+      ref={lenisRef}
+      root
+      options={{
+        autoRaf: false,
+      }}
+    >
       {children}
     </ReactLenis>
   );
-};
+}
